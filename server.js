@@ -13,6 +13,8 @@ app.use(cors({
   ],
   credentials: true
 }));
+console.log("✅ CORS configured for frontend + localhost");
+
 app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URI, {
