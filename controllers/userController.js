@@ -8,17 +8,29 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   const { username, bio, profileImage } = req.body;
+
   try {
     const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+    if (username && username !== user.username) {
+      const existingUser = await User.findOne({ username });
+      if (existingUser && existingUser._id.toString() !== req.user.id) {
+        return res.status(400).json({ error: "Username already exists" });
+      }
+    }
+
     user.username = username;
     user.bio = bio;
     user.profileImage = profileImage;
     await user.save();
+
     res.json(user);
-  } catch {
+  } catch (err) {
+    console.error("Update Error:", err);
     res.status(500).json({ error: "Failed to update profile" });
   }
 };
+
 
 exports.addLink = async (req, res) => {
   const { title, url } = req.body;
